@@ -34,8 +34,8 @@ class simpleEDMD:
         self.koopman_matrix = np.linalg.pinv(G)@A
         
         # compute koopman eigenvalues
-        self.koopman_eigenvalues, self.right_eigenvectors = self.sort_eig(self.koopman_matrix)
-        self.left_eigenvectors = np.linalg.pinv(self.right_eigenvectors)  # w_star.T
+        self.koopman_eigenvalues, self.left_eigenvectors, self.right_eigenvectors = self.sort_eig(self.koopman_matrix)
+        #self.left_eigenvectors = np.linalg.pinv(self.right_eigenvectors)  # w_star.T
         
         # compute koopman eigenfunctions
         
@@ -55,9 +55,9 @@ class simpleEDMD:
     
     def sort_eig(self, matrix):
 
-        eig_vals, eig_vecs = np.linalg.eig(matrix)
+        eig_vals, eig_lvecs, eig_rvecs = scipy.linalg.eig(matrix, left= True)
         ind = eig_vals.argsort()[::-1]
-        return (eig_vals[ind], eig_vecs[:, ind])
+        return (eig_vals[ind], eig_lvecs[:, ind].T, eig_rvecs[:, ind])
                 
                 
             
