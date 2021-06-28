@@ -45,7 +45,7 @@ class simpleEDMD:
         
         
         # compute B
-        B = np.linalg.pinv(Psi_X) @ X
+        B = np.linalg.pinv(Psi_X) @ self.X
 
         # compute koopman modes
         self.koopman_modes = (self.left_eigenvectors @ B).T
