@@ -45,10 +45,13 @@ class simpleEDMD:
         
         
         # compute B
-        B = np.linalg.pinv(Psi_X) @ self.X
+        self.B = np.linalg.pinv(Psi_X) @ self.X
 
         # compute koopman modes
-        self.koopman_modes = (self.left_eigenvectors @ B).T
+        self.koopman_modes = (self.left_eigenvectors.T @ self.B).T
+        
+    #def predict_next_step(self):
+        
 
     def dictionary_Hermite_poly(self, xm):
 
