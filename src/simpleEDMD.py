@@ -2,15 +2,15 @@ import numpy as np
 import pandas as pd
 import scipy.linalg
 from scipy import special
-import src.dictionary_strategy as d_strategy
+
 
 class simpleEDMD:
 
-    def __init__(self, X, Y):
+    def __init__(self, X, Y, dictionary_strategy):
 
         self.X = X
         self.Y = Y
-
+        self.dictionary_strategy = dictionary_strategy
         # self.dictionary
 
     def compute_koopman_operator(self):
@@ -51,8 +51,7 @@ class simpleEDMD:
         #         dictionary.append(Hx1(xm[0]) * Hx2(xm[1]))
         # return np.array([dictionary])
 
-        h_strategy = d_strategy.Herimite_strategy()
-        return h_strategy.dictionary(xm)
+        return self.dictionary_strategy.dictionary(xm)
 
     def sort_eig(self, matrix):
 
