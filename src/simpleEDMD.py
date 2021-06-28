@@ -42,16 +42,30 @@ class simpleEDMD:
         self.left_eigenvectors = np.linalg.pinv(self.right_eigenvectors).T # scaled w_star
         
         # compute koopman eigenfunctions
-        
+        # see method compute_koopman_eigenfunctions
         
         # compute B
         self.B = np.linalg.pinv(Psi_X) @ self.X
 
         # compute koopman modes
         self.koopman_modes = (self.left_eigenvectors.T @ self.B).T
+    
+    def compute_koopman_eigenfunctions(self, test_X):
         
-    #def predict_next_step(self):
+        Psi_test_X = self.dictionary_Hermite_poly(test_X)
+        return Psi_test_X@self.right_eigenvectors.real
         
+
+    def predict_next_timestep(self, X_n):
+        
+        Phi = self.compute_koopman_eigenfunctions(X_n) # 100x25
+        Mu  = np.diag(self.koopman_eigenvalues) # 25x25
+        V = self.koopman_modes #2x25
+        
+        
+        X_next = Phi @ Mu @ V.T #100x2
+        
+        return X_next
 
     def dictionary_Hermite_poly(self, xm):
 
