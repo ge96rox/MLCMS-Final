@@ -17,28 +17,38 @@ class simpleEDMD:
         # dimension and data format specificed to 4.1.1
         # needs GENERALIZATION
 
-        G = np.zeros((25, 25))
-        A = np.zeros((25, 25))
+        #G = np.zeros((25, 25))
+        #A = np.zeros((25, 25))
 
-        for m in range(len(self.X)):
-            psi_xm = self.dictionary_Hermite_poly(self.X[m])
-            psi_ym = self.dictionary_Hermite_poly(self.Y[m])
+        #for m in range(len(self.X)):
+            #psi_xm = self.dictionary_Hermite_poly(self.X[m])
+            #psi_ym = self.dictionary_Hermite_poly(self.Y[m])
 
-            G += psi_xm.T @ psi_xm
-            A += psi_xm.T @ psi_ym
-        G /= len(self.X)
-        A /= len(self.X)
-
+            #G += psi_xm.T @ psi_xm
+            #A += psi_xm.T @ psi_ym
+        
+        Psi_X = self.dictionary_Hermite_poly(self.X)
+        Psi_Y = self.dictionary_Hermite_poly(self.Y)
+        
+        G = Psi_X.T @ Psi_X /len(self.X)
+        A = Psi_X.T @ Psi_Y /len(self.X)
+            
+    
         # compute koopman matrix
         self.koopman_matrix = np.linalg.pinv(G) @ A
 
         # compute koopman eigenvalues
-        self.koopman_eigenvalues, self.left_eigenvectors, self.right_eigenvectors = self.sort_eig(self.koopman_matrix)
-        # self.left_eigenvectors = np.linalg.pinv(self.right_eigenvectors)  # w_star.T
-
+        self.koopman_eigenvalues, self.levecs, self.right_eigenvectors = self.sort_eig(self.koopman_matrix)
+        self.left_eigenvectors = np.linalg.pinv(self.right_eigenvectors).T # scaled w_star
+        
         # compute koopman eigenfunctions
+        
+        
+        # compute B
+        B = np.linalg.pinv(Psi_X) @ X
 
         # compute koopman modes
+        self.koopman_modes = (self.left_eigenvectors @ B).T
 
     def dictionary_Hermite_poly(self, xm):
 

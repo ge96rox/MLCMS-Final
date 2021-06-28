@@ -21,7 +21,9 @@ class Herimite_strategy(Strategy):
                           H0(x) * H3(y), H1(x) * H3(y), H2(x) * H3(y), H3(x) * H3(y), H4(x) * H3(y),
                           H0(x) * H4(y), H1(x) * H4(y), H2(x) * H4(y), H3(x) * H4(y), H4(x) * H4(y)]
 
-    def dictionary(self, xm):
-        dictionary = self.D(xm[0], xm[1])
+    def dictionary(self, X):
+        dictionary = []
+        for xm in X:
+            dictionary.append( self.D(xm[0], xm[1]))
 
-        return np.array([dictionary])
+        return np.array(dictionary)
