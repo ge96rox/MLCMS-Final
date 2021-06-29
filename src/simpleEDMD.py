@@ -67,6 +67,17 @@ class simpleEDMD:
         
         return X_next
     
+    def predict_n_timestep(self, X_initial, n):
+            
+        Phi = self.compute_koopman_eigenfunctions(X_initial) # 100x25
+        Mu  = np.diag(self.koopman_eigenvalues) # 25x25
+        V = self.koopman_modes #2x25
+        
+        
+        X_n = Phi @ np.linalg.matrix_power(Mu,n) @ V.T #100x2
+        
+        return X_n
+    
 
 
     def dictionary_Hermite_poly(self, xm):
