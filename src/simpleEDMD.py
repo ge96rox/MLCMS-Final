@@ -53,12 +53,12 @@ class simpleEDMD:
     def compute_koopman_eigenfunctions(self, test_X):
         
         Psi_test_X = self.dictionary_Hermite_poly(test_X)
-        return Psi_test_X@self.right_eigenvectors.real
+        return Psi_test_X@self.right_eigenvectors
         
 
-    def predict_next_timestep(self, X_n):
+    def predict_next_timestep(self, X_initial):
         
-        Phi = self.compute_koopman_eigenfunctions(X_n) # 100x25
+        Phi = self.compute_koopman_eigenfunctions(X_initial) # 100x25
         Mu  = np.diag(self.koopman_eigenvalues) # 25x25
         V = self.koopman_modes #2x25
         
@@ -66,6 +66,8 @@ class simpleEDMD:
         X_next = Phi @ Mu @ V.T #100x2
         
         return X_next
+    
+
 
     def dictionary_Hermite_poly(self, xm):
 
