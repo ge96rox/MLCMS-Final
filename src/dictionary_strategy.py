@@ -1,5 +1,14 @@
 import numpy as np
 from scipy import special
+import pandas as pd
+
+import copy
+import mpl_toolkits.mplot3d.axes3d as p3
+import sklearn.manifold as manifold
+import datafold.dynfold as dfold
+import datafold.pcfold as pfold
+from datafold.dynfold import LocalRegressionSelection
+
 
 
 class Strategy(object):
@@ -27,3 +36,21 @@ class Herimite_strategy(Strategy):
             dictionary.append( self.D(xm[0], xm[1]))
 
         return np.array(dictionary)
+    
+    
+class dmap_strategy(Strategy):
+    
+    def _init_(self):
+        pass
+    
+    def dictionary(self, X):
+        X_pcm = pfold.PCManifold(X)
+        X_pcm.optimize_parameters()
+        dmap = dfold.DiffusionMaps(
+            kernel=pfold.GaussianKernel(epsilon=X_pcm.kernel.epsilon),
+            n_eigenpairs=5,
+            dist_kwargs=dict(cut_off=X_pcm.cut_off),
+        )
+        dmap = dmap.fit(X_pcm)
+    
+        return dmap.eigenvectors_[:,:]

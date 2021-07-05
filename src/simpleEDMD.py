@@ -27,8 +27,8 @@ class simpleEDMD:
             #G += psi_xm.T @ psi_xm
             #A += psi_xm.T @ psi_ym
         
-        Psi_X = self.dictionary_Hermite_poly(self.X)
-        Psi_Y = self.dictionary_Hermite_poly(self.Y)
+        Psi_X = self.dictionary_strategy.dictionary(self.X)
+        Psi_Y = self.dictionary_strategy.dictionary(self.Y)
         
         G = Psi_X.T @ Psi_X /len(self.X)
         A = Psi_X.T @ Psi_Y /len(self.X)
@@ -52,7 +52,7 @@ class simpleEDMD:
     
     def compute_koopman_eigenfunctions(self, test_X):
         
-        Psi_test_X = self.dictionary_Hermite_poly(test_X)
+        Psi_test_X = self.dictionary_strategy.dictionary(test_X)
         return Psi_test_X@self.right_eigenvectors
         
 
@@ -79,7 +79,7 @@ class simpleEDMD:
         return X_n
     
 
-
+    '''
     def dictionary_Hermite_poly(self, xm):
 
         # dictionary = []
@@ -92,6 +92,7 @@ class simpleEDMD:
         # return np.array([dictionary])
 
         return self.dictionary_strategy.dictionary(xm)
+    '''
 
     def sort_eig(self, matrix):
 
