@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import special
+from scipy.spatial import distance
 import pandas as pd
 
 import copy
@@ -16,7 +17,7 @@ class Strategy(object):
         pass
 
 
-class Herimite_strategy(Strategy):
+class Hermite_strategy(Strategy):
 
     def __init__(self):
         H0 = special.hermite(0, monic=True)
@@ -37,20 +38,42 @@ class Herimite_strategy(Strategy):
 
         return np.array(dictionary)
     
+    def ini(self, X):
+        pass
+    
     
 class dmap_strategy(Strategy):
     
     def _init_(self):
         pass
     
-    def dictionary(self, X):
+    def ini(self, X):
         X_pcm = pfold.PCManifold(X)
         X_pcm.optimize_parameters()
-        dmap = dfold.DiffusionMaps(
+        self.dmap = dfold.DiffusionMaps(
             kernel=pfold.GaussianKernel(epsilon=X_pcm.kernel.epsilon),
-            n_eigenpairs=5,
+            n_eigenpairs=13,
             dist_kwargs=dict(cut_off=X_pcm.cut_off),
         )
-        dmap = dmap.fit(X_pcm)
+    
+    def dictionary(self, X):
+        
+        dmap = self.dmap.fit(X)
     
         return dmap.eigenvectors_[:,:]
+
+    
+class rbf_strategy(Strategy):
+    
+    def _init_(self):
+        pass
+    
+    def ini(self, X):
+        
+        self.rand_id = np.random.permutation(X.shape[0])[0:15]
+        self.eps = np.average(distance.cdist(X,X))
+        
+    def dictionary(self, X):
+        
+        return np.exp(-(distance.cdist(X,X[self.rand_id,:]) / self.eps)**2)
+        # return np.sqrt((distance.cdist(X,X[self.rand_id,:])/self.eps)**2+1)

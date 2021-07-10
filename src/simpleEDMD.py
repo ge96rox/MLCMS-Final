@@ -27,8 +27,13 @@ class simpleEDMD:
             #G += psi_xm.T @ psi_xm
             #A += psi_xm.T @ psi_ym
         
+        self.dictionary_strategy.ini(self.X)
+        
         Psi_X = self.dictionary_strategy.dictionary(self.X)
         Psi_Y = self.dictionary_strategy.dictionary(self.Y)
+        
+        self.PsiX = Psi_X
+        self.PsiY = Psi_Y
         
         G = Psi_X.T @ Psi_X /len(self.X)
         A = Psi_X.T @ Psi_Y /len(self.X)
