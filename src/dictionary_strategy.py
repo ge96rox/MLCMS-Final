@@ -44,36 +44,41 @@ class Hermite_strategy(Strategy):
     
 class dmap_strategy(Strategy):
     
-    def _init_(self):
-        pass
+    def __init__(self, n, e):
+        
+        # number of dictionary functions
+        self.n = n
+        # bandwidth = e * average distance
+        self.e = e
+    
+    def g_kernel(self, data, x_center, eps):
+        
+        # Gaussian kernel
+        return np.exp(-(distance.cdist(data,x_center) / self.eps)**2)
     
     def ini(self, X):
-        X_pcm = pfold.PCManifold(X)
-        X_pcm.optimize_parameters()
-        self.dmap = dfold.DiffusionMaps(
-            kernel=pfold.GaussianKernel(epsilon=X_pcm.kernel.epsilon),
-            n_eigenpairs=13,
-            dist_kwargs=dict(cut_off=X_pcm.cut_off),
+        
+        # dmap
+        self.X_pcm = pfold.PCManifold(X)
+        self.X_pcm.optimize_parameters()
+        dmap = dfold.DiffusionMaps(
+            kernel=pfold.GaussianKernel(epsilon=self.X_pcm.kernel.epsilon),
+            n_eigenpairs=self.n,
+            dist_kwargs=dict(cut_off=self.X_pcm.cut_off),
         )
-    
+        dmap = dmap.fit(self.X_pcm)
+        # n dmap eigenvectors in columns
+        v = dmap.eigenvectors_[:,:]
+        
+        # rbf
+        self.rand_id = np.random.permutation(self.X_pcm.shape[0])[0:self.n]
+        self.eps = np.average(distance.cdist(self.X_pcm,self.X_pcm)) * self.e
+        
+        phi = self.g_kernel(self.X_pcm,self.X_pcm[self.rand_id,:],self.eps)
+        self.c,_,_,_ = np.linalg.lstsq(phi, v, rcond = None)
+              
     def dictionary(self, X):
         
-        dmap = self.dmap.fit(X)
+        phi = self.g_kernel(X,self.X_pcm[self.rand_id,:],self.eps)
     
-        return dmap.eigenvectors_[:,:]
-
-    
-class rbf_strategy(Strategy):
-    
-    def _init_(self):
-        pass
-    
-    def ini(self, X):
-        
-        self.rand_id = np.random.permutation(X.shape[0])[0:15]
-        self.eps = np.average(distance.cdist(X,X))
-        
-    def dictionary(self, X):
-        
-        return np.exp(-(distance.cdist(X,X[self.rand_id,:]) / self.eps)**2)
-        # return np.sqrt((distance.cdist(X,X[self.rand_id,:])/self.eps)**2+1)
+        return phi@self.c
